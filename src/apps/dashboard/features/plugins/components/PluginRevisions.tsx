@@ -54,6 +54,7 @@ const PluginRevisions: FC<PluginRevisionsProps> = ({
                             startIcon={<Download />}
                             variant='outlined'
                             onClick={onInstall(version)}
+                            disabled={version.requiresServerUpdate === true}
                         >
                             {globalize.translate('HeaderInstall')}
                         </Button>

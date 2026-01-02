@@ -117,8 +117,10 @@ const PluginPage: FC = () => {
                     ?? pluginInfo?.Status !== PluginStatus.Disabled,
                 name: pluginName || pluginInfo?.Name || packageInfo?.name,
                 owner: pluginInfo?.CanUninstall === false ? 'jellyfin' : packageInfo?.owner,
+                requiresServerUpdate: version?.requiresServerUpdate,
                 status: pluginInfo?.Status,
                 configurationPage: findBestConfigurationPage(configurationPages || [], pluginId),
+                targetAbi: version?.targetAbi,
                 version,
                 versions: packageInfo?.versions || []
             };
@@ -307,6 +309,9 @@ const PluginPage: FC = () => {
         setIsUninstallConfirmOpen(false);
     }, []);
 
+    const requiresServerUpdate = pluginDetails?.requiresServerUpdate === true;
+    const requiredTargetAbi = pluginDetails?.targetAbi ?? pluginDetails?.version?.targetAbi;
+
     return (
         <Page
             id='addPluginPage'
@@ -370,13 +375,20 @@ const PluginPage: FC = () => {
                             <Stack spacing={1} sx={{ flexBasis: '50%' }}>
                                 {!isLoading && !pluginDetails?.status && (
                                     <>
-                                        <Alert severity='info'>
-                                            {globalize.translate('ServerRestartNeededAfterPluginInstall')}
-                                        </Alert>
+                                        {requiresServerUpdate ? (
+                                            <Alert severity='warning'>
+                                                {`This plugin requires you to update to version ${requiredTargetAbi ?? 'unknown'}`}
+                                            </Alert>
+                                        ) : (
+                                            <Alert severity='info'>
+                                                {globalize.translate('ServerRestartNeededAfterPluginInstall')}
+                                            </Alert>
+                                        )}
 
                                         <Button
                                             startIcon={<Download />}
                                             onClick={onInstall()}
+                                            disabled={requiresServerUpdate}
                                             loading={isInstalling}
                                         >
                                             {globalize.translate('HeaderInstall')}

@@ -10,7 +10,9 @@ export interface PluginDetails {
     name?: string
     owner?: string
     configurationPage?: ConfigurationPageInfo
+    requiresServerUpdate?: boolean
     status?: PluginStatus
+    targetAbi?: string | null
     version?: VersionInfo
     versions: VersionInfo[]
 }
